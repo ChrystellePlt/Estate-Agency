@@ -9,6 +9,7 @@ use App\Repository\PropertyRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AdminPropertyController extends AbstractController
@@ -30,9 +31,33 @@ class AdminPropertyController extends AbstractController
     }
 
     /**
-     * @Route("/admin/{id}", name="admin.property.edit")
+     * @Route("/admin/property/create", name="admin.property.new")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function new(Request $request)
+    {
+        $property = new Property();
+        $form = $this->createForm(PropertyType::class, $property);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->em->persist($property);
+            $this->em->flush();
+            return $this->redirectToRoute('admin.property.index');
+        }
+
+        return $this->render('admin/property/new.html.twig', [
+            'property' => $property,
+            'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/admin/property/{id}", name="admin.property.edit", methods="GET|POST")
      * @param Property $property
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function edit(Property $property, Request $request)
     {
@@ -48,5 +73,19 @@ class AdminPropertyController extends AbstractController
             'property' => $property,
             'form' => $form->createView()
         ]);
+    }
+
+    /**
+     * @Route("/admin/property/{id}", name="admin.property.delete", methods="DELETE")
+     * @param Property $property
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function delete(Property $property)
+    {
+//        $this->em->remove($property);
+//        $this->em->flush();
+        return new Response('suppression');
+        return $this->redirectToRoute('admin.property.index');
+
     }
 }
