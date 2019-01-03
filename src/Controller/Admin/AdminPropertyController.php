@@ -2,19 +2,26 @@
 
 namespace App\Controller\Admin;
 
-
-use App\Entity\Option;
 use App\Entity\Property;
 use App\Form\PropertyType;
 use App\Repository\PropertyRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AdminPropertyController extends AbstractController
 {
+    /**
+     * @var PropertyRepository
+     */
+    private $repository;
+
+    /**
+     * @var ObjectManager
+     */
+    private $em;
+
     public function __construct(PropertyRepository $repository, ObjectManager $em)
     {
         $this->repository = $repository;
@@ -82,7 +89,7 @@ class AdminPropertyController extends AbstractController
      * @Route("/admin/property/{id}", name="admin.property.delete", methods="DELETE")
      * @param Property $property
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delete(Property $property, Request $request) {
         if ($this->isCsrfTokenValid('delete' . $property->getId(), $request->get('_token'))) {
